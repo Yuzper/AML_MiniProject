@@ -22,7 +22,7 @@ def install_and_import(pkg_name, install_name=None):
         print(f"{pkg_name} is already installed.")
     except ImportError:
         print(f"{pkg_name} not found. Installing...")
-        subprocess.check_call([sys.executable, "-m", "pip", "install", install_name])
+        subprocess.check_call([sys.executable, "-m", "conda", "install", install_name])
 
 # Loop and ensure all are installed
 for pkg, pip_name in required_packages.items():

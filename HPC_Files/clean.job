@@ -1,0 +1,16 @@
+#!/bin/bash
+
+#SBATCH --job-name=berk_test
+#SBATCH --output=berk_test.out      # Name of output file (%j expands to jobId)
+#SBATCH --cpus-per-task=2   
+#SBATCH --mem-per-cpu=8G
+#SBATCH --time=0-06:00:00
+#SBATCH --partition=scavenge
+#SBATCH --mail-type=END
+
+echo "Running on $(hostname):"
+module load Anaconda3
+eval "$(conda shell.bash hook)"
+source /home/ivpe/.bashrc
+conda activate chatbot
+python berk_test.py
