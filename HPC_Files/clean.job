@@ -13,4 +13,4 @@ module load Anaconda3
 eval "$(conda shell.bash hook)"
 source /home/ivpe/.bashrc
 conda activate chatbot
-python berk_test.py
+python hpc_clean.py
