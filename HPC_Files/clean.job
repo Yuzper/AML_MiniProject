@@ -10,6 +10,7 @@
 
 echo "Running on $(hostname):"
 module load Anaconda3
+module load TensorFlow/2.0.0-fosscuda-2019b-Python-3.7.4
 eval "$(conda shell.bash hook)"
 source /home/ivpe/.bashrc
 conda activate chatbot
