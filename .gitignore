@@ -1,0 +1,49 @@
+# Byte-compiled / optimized files
+__pycache__/
+working/*
+
+# IDEs & editor settings
+.vscode
+.vscode/
+.ionide/symbolCache.db
+
+# Test reports & files
+.coverage
+.pytest_cache
+.scannerwork
+mocks/*
+
+# Operating system files
+.DS_Store
+
+# Virtual environment configuration
+.venv/
+venv
+
+
+# IDE files
+.idea/
+.ftpconfig
+.ftpconfig.cson
+.ftpignore
+
+# Distribution / packaging
+*.egg-info
+*.synctex.gz
+.ruff_cache
+
+# Log files
+*.log
+
+# Tex
+*.pdf
+*.aux
+*.glo
+*.ist
+*.out
+
+# mlflow experiment logs
+/mlruns
+
+# Data folder
+data/
