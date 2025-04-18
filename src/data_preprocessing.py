@@ -115,7 +115,7 @@ def prepare_text(example: Dict) -> Dict:
 
 def encode_label(example: Dict, label_map: Dict[str, int] | None = None) -> Dict:
     label_map = label_map or {"human": 0, "machine": 1}
-    example["label"] = label_map.get(example.get("model"), -1)
+    example["labels"] = label_map.get(example.get("model"), -1)
     return example
 
 
@@ -126,8 +126,8 @@ def tokenize(example: Dict, tokenizer, max_length: int = 512) -> Dict:
         truncation=True,
         max_length=max_length,
     )
-    if "label" in example:
-        toks["label"] = example["label"]
+    if "labels" in example:
+        toks["labels"] = example["labels"]
     return toks
 
 
@@ -136,19 +136,19 @@ def tokenize(example: Dict, tokenizer, max_length: int = 512) -> Dict:
 # ---------------------------------------------------------------------------
 
 def build_tf_dataset(hf_ds: Dataset, batch_size: int = 16, shuffle: bool = True) -> tf.data.Dataset:
-    """Convert a tokenised HuggingFace dataset to tf.data.Dataset.
+    """Convert a tokenised HF dataset into a `tf.data.Dataset`.
 
-    *If the split is the public `raid_test` set it has **no labels**, so we
-    dynamically decide whether to expose the `label` column.*"""
-    has_label = "label" in hf_ds.column_names
-
-    cols = ["input_ids", "attention_mask"] + (["label"] if has_label else [])
+    Returns *(x_dict, y_tensor)* tuples when labels are present, otherwise just
+    *x_dict* for the public `raid_test` split.
+    """
+    has_labels = "labels" in hf_ds.column_names
+    cols = ["input_ids", "attention_mask"] + (["labels"] if has_labels else [])
     hf_ds.set_format("tensorflow", columns=cols)
 
     return hf_ds.to_tf_dataset(
         columns=["input_ids", "attention_mask"],
-        label_cols="label" if has_label else None,
-        shuffle=shuffle if has_label else False,  # don’t shuffle unlabeled test
+        label_cols="labels" if has_labels else None,
+        shuffle=shuffle if has_labels else False,
         batch_size=batch_size,
     )
 
@@ -186,7 +186,7 @@ def preprocess_data(
 
         if name != "test":
             ds = ds.map(encode_label)
-            ds = ds.filter(lambda x: x["label"] != -1)
+            ds = ds.filter(lambda x: x["labels"] != -1)
 
         ds = ds.map(lambda ex: tokenize(ex, tokenizer), batched=False)
 

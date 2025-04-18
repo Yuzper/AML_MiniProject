@@ -52,6 +52,30 @@ To run the preprocessing:
 
 Processed datasets are saved under `data/processed/<run_name>/<split>/`.
 
+5 Training the BERT Detector
+----------------------
+
+The training script trains a BERT-based model on the preprocessed RAID dataset. It supports saving model checkpoints and training metrics.
+
+To train the model:
+
+- Local debug run:
+  ```bash
+  python -m src.train \
+      --dataset-root data/processed/raid_local \
+      --model-name distilbert-base-uncased \
+      --epochs 2 --run-name debug_run
+  ```
+
+- Full production run:
+  ```bash
+  python -m src.train \
+      --dataset-root data/processed/raid_full \
+      --epochs 5
+  ```
+
+Model checkpoints are saved under `outputs/checkpoints/<run_name>/`, and training metrics are saved as JSON under `outputs/metrics/`.
+
 
 
 
