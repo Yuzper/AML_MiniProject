@@ -47,3 +47,4 @@ venv
 
 # Data folder
 data/
+outputs/checkpoints/
