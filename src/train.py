@@ -6,10 +6,13 @@ Example (local debug run):
     python -m src.train \
         --dataset-root data/processed/raid_local \
         --model-name distilbert-base-uncased \
-        --epochs 2 --run-name debug_run
+        --epochs 2 --run-name distil_local
 
 Example (full production):
-    python -m src.train --dataset-root data/processed/raid_full --epochs 5
+    python -m src.train \
+    --dataset-root data/processed/raid_full \
+    --model-name bert-base-uncased \
+    --epochs 5
 """
 
 from __future__ import annotations
@@ -37,6 +40,14 @@ def load_split(dataset_root: Path, split: str) -> Optional[tf.data.Dataset]:
 def main(args: argparse.Namespace) -> None:
     root = Path(args.dataset_root).resolve()
     train_ds = load_split(root, "train")
+
+    print("🔍 Inspecting train_ds...")
+    for batch in train_ds.take(1):
+        print("Batch:", batch)
+        print("Type:", type(batch))
+
+
+
     val_ds = load_split(root, "val")          # may be None
     val_ood = load_split(root, "val_ood")     # optional extra split
     if val_ds is None and val_ood is not None:
@@ -46,15 +57,19 @@ def main(args: argparse.Namespace) -> None:
 
     # ── model & optimiser ───────────────────────────────────────────────────
     model = get_model(args.model_name)
-    steps_per_epoch = tf.data.experimental.cardinality(train_ds).numpy()
+    steps = tf.data.experimental.cardinality(train_ds)
+    steps_per_epoch = steps.numpy() if steps != tf.data.UNKNOWN_CARDINALITY else None
     optimiser, _ = create_optimizer(
         init_lr=args.learning_rate,
         num_warmup_steps=0,
         num_train_steps=steps_per_epoch * args.epochs,
     )
+    
+    loss_fn = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
+
     model.compile(
         optimizer=optimiser,
-        loss=model.compute_loss,
+        loss=loss_fn,
         metrics=["accuracy"],
     )
 

@@ -92,7 +92,7 @@ def download_data(
             train_ds = train_ds.remove_columns(strat_col)
             val_ds = val_ds.remove_columns(strat_col)
             test_ds = test_ds.remove_columns(strat_col)
-
+        
         return DatasetDict(train=train_ds, val=val_ds, test=test_ds)
 
     # ───────────────────────── Production mode ─────────────────────────────
@@ -113,11 +113,9 @@ def prepare_text(example: Dict) -> Dict:
     return example
 
 
-def encode_label(example: Dict, label_map: Dict[str, int] | None = None) -> Dict:
-    label_map = label_map or {"human": 0, "machine": 1}
-    example["labels"] = label_map.get(example.get("model"), -1)
+def encode_label(example, label_map=None):
+    example["labels"] = np.int32(0 if example["model"] == "human" else 1)
     return example
-
 
 def tokenize(example: Dict, tokenizer, max_length: int = 512) -> Dict:
     toks = tokenizer(
@@ -141,13 +139,15 @@ def build_tf_dataset(hf_ds: Dataset, batch_size: int = 16, shuffle: bool = True)
     Returns *(x_dict, y_tensor)* tuples when labels are present, otherwise just
     *x_dict* for the public `raid_test` split.
     """
+    
     has_labels = "labels" in hf_ds.column_names
     cols = ["input_ids", "attention_mask"] + (["labels"] if has_labels else [])
+
     hf_ds.set_format("tensorflow", columns=cols)
 
     return hf_ds.to_tf_dataset(
         columns=["input_ids", "attention_mask"],
-        label_cols="labels" if has_labels else None,
+        label_cols=["labels"] if has_labels else None,
         shuffle=shuffle if has_labels else False,
         batch_size=batch_size,
     )
@@ -186,15 +186,19 @@ def preprocess_data(
 
         if name != "test":
             ds = ds.map(encode_label)
+            print(f"{name} labels -1 count:", sum(1 for x in ds if x["labels"] == -1))
             ds = ds.filter(lambda x: x["labels"] != -1)
 
+        print("Before tokenizing:", ds.column_names)
         ds = ds.map(lambda ex: tokenize(ex, tokenizer), batched=False)
+        print("After tokenizing:", ds.column_names)
 
         out_dir = out_root / name
         out_dir.mkdir(parents=True, exist_ok=True)
         ds.save_to_disk(out_dir.as_posix())
 
         tf_ds = build_tf_dataset(ds, batch_size=batch_size, shuffle=(name == "train"))
+
         tf.data.Dataset.save(tf_ds, (out_dir / "tf_dataset").as_posix())
 
     print("✅ All splits cached in", out_root.resolve())
