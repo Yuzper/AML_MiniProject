@@ -31,7 +31,9 @@ If all these steps work, the installation was succesfull!
 3 A few notes on UV usage
 ----------------------
 
-If you want to install the dependencies run `uv sycn` (this is the equivalent to `poetry install`)
+If you want to install the dependencies run `uv sycn`
+
+IF YOU'RE RUNNING IT LOCALLY, MAKE SURE TO SWITCH FROM TENSORFLOW-GPU TO TENSORFLOW
 
 To add new packages, you just need to do `uv add <package_name>`.
 
@@ -61,17 +63,18 @@ To train the model:
 
 - Local debug run:
   ```bash
-  python -m src.train \
-      --dataset-root data/processed/raid_local \
-      --model-name distilbert-base-uncased \
-      --epochs 2 --run-name debug_run
+    python -m src.train \
+        --dataset-root data/processed/raid_local \
+        --model-name distilbert-base-uncased \
+        --epochs 2 --run-name distil_local
   ```
 
 - Full production run:
   ```bash
-  python -m src.train \
-      --dataset-root data/processed/raid_full \
-      --epochs 5
+    python -m src.train \
+        --dataset-root data/processed/raid_full \
+        --model-name bert-base-uncased \  
+        --epochs 5
   ```
 
 Model checkpoints are saved under `outputs/checkpoints/<run_name>/`, and training metrics are saved as JSON under `outputs/metrics/`.

@@ -2,26 +2,22 @@
 Minimal BERT sequence‑classifier wrapper (TensorFlow/Keras).
 """
 
-from transformers import TFBertForSequenceClassification
+# src/model.py
+from transformers import (
+    TFBertForSequenceClassification,
+    TFDistilBertForSequenceClassification,
+    AutoConfig,
+)
 
-def get_model(model_name: str = "bert-base-uncased", num_labels: int = 2):
-    """
-    Load a pre‑trained BERT and initialise the classification head.
-
-    Parameters
-    ----------
-    model_name
-        Any checkpoint from the Hugging Face Hub.
-    num_labels
-        Number of classes (binary = 2).
-
-    Returns
-    -------
-    TFBertForSequenceClassification
-    """
-    
-    return TFBertForSequenceClassification.from_pretrained(
-        model_name,
-        num_labels=num_labels,
-        problem_type="single_label_classification",
-    )
+def get_model(model_name: str, num_labels: int = 2):
+    cfg = AutoConfig.from_pretrained(model_name, num_labels=num_labels)
+    if cfg.model_type == "distilbert":
+        return TFDistilBertForSequenceClassification.from_pretrained(
+            model_name, config=cfg
+        )
+    elif cfg.model_type == "bert":
+        return TFBertForSequenceClassification.from_pretrained(
+            model_name, config=cfg
+        )
+    else:
+        raise ValueError(f"Unsupported model type: {cfg.model_type}")
