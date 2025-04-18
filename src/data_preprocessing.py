@@ -99,7 +99,7 @@ def download_data(
     print("▶ Production mode – pulling full official splits")
     train_ds = load_dataset("liamdugan/raid", "raid", split="train")
     val_ds = load_dataset("liamdugan/raid", "raid", split="extra")
-    test_ds = load_dataset("liamdugan/raid", "raid_test", split="train")
+    test_ds = load_dataset("liamdugan/raid", "raid_test", split="test")
     return DatasetDict(train=train_ds, val=val_ds, test=test_ds)
 
 
