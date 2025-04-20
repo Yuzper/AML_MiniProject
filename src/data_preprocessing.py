@@ -97,9 +97,13 @@ def download_data(
 
     # ───────────────────────── Production mode ─────────────────────────────
     print("▶ Production mode – pulling full official splits")
+    # main training material
     train_ds = load_dataset("liamdugan/raid", "raid", split="train")
-    val_ds = load_dataset("liamdugan/raid", "raid", split="extra")
-    test_ds = load_dataset("liamdugan/raid", "raid_test", split="test")
+    val_ds   = load_dataset("liamdugan/raid", "raid", split="extra")
+
+    # held‑out test set
+    test_ds  = load_dataset("liamdugan/raid", "raid_test", split="test")
+
     return DatasetDict(train=train_ds, val=val_ds, test=test_ds)
 
 
@@ -175,6 +179,11 @@ def preprocess_data(
         test_fraction=test_fraction,
         stratify=stratify,
     )
+
+    print("✅ Splits loaded:")
+    for name, ds in splits.items():
+        print(f"  - {name}: {len(ds)} rows")
+
 
     tokenizer = AutoTokenizer.from_pretrained(tokenizer_name)
     out_root = Path("data/processed") / run_name

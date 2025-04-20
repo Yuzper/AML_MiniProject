@@ -2,11 +2,11 @@
 name = "AML_Mini_Project"
 version = "0.1.0"
 dependencies = [
-    "numpy",
-    "pandas",
+    "numpy>=1.22.4,<2.0.0",
+    "pandas>=1.4.0",
     "matplotlib",
     "scikit-learn",
-    "tensorflow",
+    "tensorflow-gpu==2.10.0", #switch to tensorflow for local development
     "datasets",
     "transformers",
     "tf-keras",
@@ -14,4 +14,3 @@ dependencies = [
 ]
 
 readme = "README.md"
-requires-python = ">=3.10"
