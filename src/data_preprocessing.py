@@ -1,14 +1,13 @@
-# src/data_preprocessing.py
 """Light‑weight preprocessing pipeline for the RAID anti‑AI‑text dataset.
 
-Changes (2025‑04‑17)
--------------------
-* **Fix** stratified splitting error when `model` column is a plain `Value`.
-  We now create a temporary binary column `source_type` (human vs machine),
-  encode it as a `ClassLabel`, and stratify on that. The column is removed
-  before returning the splits.
-* Minor: expose `--no-stratify` flag to allow purely random slicing when the
-  user doesn't care about class balance.
+Updates (2025‑04‑20)
+--------------------
+* **Fix**: public *raid_test* split has no `title`/`generation` columns – we now
+  build a unified `text` field that works for *all* splits.
+* **Refactor**: removed schema‑specific filters; the pipeline now checks only
+  the presence of the new `text` column, so local and production paths share
+  identical logic.
+* Minor: renamed `prepare_text` → `build_text` for clarity.
 """
 from __future__ import annotations
 
@@ -48,7 +47,7 @@ def download_data(
     test_fraction: float = 0.1,
     stratify: bool = True,
 ) -> DatasetDict:
-    """Return a DatasetDict with *train*, *val*, *test* splits.
+    """Return a `DatasetDict` with *train*, *val*, *test* splits.
 
     Parameters
     ----------
@@ -121,15 +120,24 @@ def download_data(
 # Row‑level transforms
 # ---------------------------------------------------------------------------
 
-def prepare_text(example: Dict) -> Dict:
-    if example.get("title") and example.get("generation"):
-        example["text"] = f"{example['title'].strip()} {example['generation'].strip()}"
+def build_text(example: Dict) -> Dict:
+    """Unify heterogeneous column names into a single `text` string."""
+    pieces = []
+    if example.get("title"):
+        pieces.append(example["title"].strip())
+    if example.get("generation"):
+        pieces.append(example["generation"].strip())
+    if example.get("text"):
+        pieces.append(example["text"].strip())
+
+    example["text"] = " ".join(pieces).strip()
     return example
 
 
-def encode_label(example, label_map=None):
+def encode_label(example: Dict) -> Dict:
     example["labels"] = np.int32(0 if example["model"] == "human" else 1)
     return example
+
 
 def tokenize(example: Dict, tokenizer, max_length: int = 512) -> Dict:
     toks = tokenizer(
@@ -148,15 +156,9 @@ def tokenize(example: Dict, tokenizer, max_length: int = 512) -> Dict:
 # ---------------------------------------------------------------------------
 
 def build_tf_dataset(hf_ds: Dataset, batch_size: int = 16, shuffle: bool = True) -> tf.data.Dataset:
-    """Convert a tokenised HF dataset into a `tf.data.Dataset`.
-
-    Returns *(x_dict, y_tensor)* tuples when labels are present, otherwise just
-    *x_dict* for the public `raid_test` split.
-    """
-    
+    """Convert a tokenised HF dataset into a `tf.data.Dataset`."""
     has_labels = "labels" in hf_ds.column_names
     cols = ["input_ids", "attention_mask"] + (["labels"] if has_labels else [])
-
     hf_ds.set_format("tensorflow", columns=cols)
 
     return hf_ds.to_tf_dataset(
@@ -194,30 +196,31 @@ def preprocess_data(
     for name, ds in splits.items():
         print(f"  - {name}: {len(ds)} rows")
 
-
     tokenizer = AutoTokenizer.from_pretrained(tokenizer_name)
     out_root = Path("data/processed") / run_name
 
     for name, ds in splits.items():
         print(f"▶ Processing {name} split ({len(ds):,} rows)…")
-        ds = ds.filter(lambda x: x["title"] is not None and x["generation"] is not None)
-        ds = ds.map(prepare_text)
 
+        # ➊ Build/keep a unified `text` column first
+        ds = ds.map(build_text, desc="build_text")
+
+        # ➋ Drop rows that still have empty text
+        ds = ds.filter(lambda x: x["text"] != "", desc="filter_non_empty")
+
+        # ➌ Label encoding only for train / val
         if name != "test":
-            ds = ds.map(encode_label)
-            print(f"{name} labels -1 count:", sum(1 for x in ds if x["labels"] == -1))
-            ds = ds.filter(lambda x: x["labels"] != -1)
+            ds = ds.map(encode_label, desc="encode_label")
 
-        print("Before tokenizing:", ds.column_names)
-        ds = ds.map(lambda ex: tokenize(ex, tokenizer), batched=False)
-        print("After tokenizing:", ds.column_names)
+        # ➍ Tokenise
+        ds = ds.map(lambda ex: tokenize(ex, tokenizer), batched=False, desc="tokenize")
 
+        # ➎ Split
         out_dir = out_root / name
         out_dir.mkdir(parents=True, exist_ok=True)
         ds.save_to_disk(out_dir.as_posix())
 
         tf_ds = build_tf_dataset(ds, batch_size=batch_size, shuffle=(name == "train"))
-
         tf.data.Dataset.save(tf_ds, (out_dir / "tf_dataset").as_posix())
 
     print("✅ All splits cached in", out_root.resolve())
