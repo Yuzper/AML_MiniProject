@@ -59,51 +59,61 @@ def download_data(
         If *True* and *local*, attempt stratified splitting on the temporary
         *source_type* column. Set to *False* to disable.
     """
+
+    ds = load_dataset("liamdugan/raid", "raid", split="train")
+    
+    # filter domain = reddit
+    print("▶ Filtering for domain = reddit")
+    print("Unique values in 'domain':", set(ds.unique("domain")))
+    ds = ds.filter(lambda x: x["domain"] == "reddit")
+
     if local:
-        print("▶ Local mode – downloading a small slice of raid/train")
-        ds = load_dataset("liamdugan/raid", "raid", split=f"train[:{sample_size}]")
-
-        if stratify:
-            # Add binary column & encode as ClassLabel for stratification
-            ds = ds.map(_make_source_type)
-            ds = ds.class_encode_column("source_type")
-            strat_col = "source_type"
-        else:
-            strat_col = None
-
-        print("▶ Creating validation / test splits (stratified =", bool(strat_col), ")")
-        tmp = ds.train_test_split(
-            test_size=test_fraction,
-            seed=RNG_SEED,
-            stratify_by_column=strat_col,
-        )
-        train_val, test_ds = tmp["train"], tmp["test"]
-
-        val_size = validation_fraction / (1.0 - test_fraction)
-        tmp = train_val.train_test_split(
-            test_size=val_size,
-            seed=RNG_SEED,
-            stratify_by_column=strat_col,
-        )
-        train_ds, val_ds = tmp["train"], tmp["test"]
-
-        # Drop helper column if it was added
-        if strat_col:
-            train_ds = train_ds.remove_columns(strat_col)
-            val_ds = val_ds.remove_columns(strat_col)
-            test_ds = test_ds.remove_columns(strat_col)
+        print("▶ Local mode – getting a small slice of raid/train")
+        # take a random sample of sample_size row
+        ds = ds.shuffle(seed=RNG_SEED).select(range(sample_size))
+    
+    else: 
+        print("▶ Production mode – get full raid/train")
+    
+    if stratify:
+        # Add binary column & encode as ClassLabel for stratification
+        print("▶ Adding 'source_type' column for stratification")
+        print("Dataset size after filtering:", len(ds))
+        print("Dataset columns before adding 'source_type':", ds.column_names)
         
-        return DatasetDict(train=train_ds, val=val_ds, test=test_ds)
+        ds = ds.map(_make_source_type, batched=False, load_from_cache_file=False)  # Ensure row-wise mapping
+        
+        print("Dataset columns after adding 'source_type':", ds.column_names)
+        if "source_type" not in ds.column_names:
+            raise ValueError("The 'source_type' column was not added to the dataset.")
+        
+        ds = ds.class_encode_column("source_type")
+        strat_col = "source_type"
+    else:
+        strat_col = None
 
-    # ───────────────────────── Production mode ─────────────────────────────
-    print("▶ Production mode – pulling full official splits")
-    # main training material
-    train_ds = load_dataset("liamdugan/raid", "raid", split="train")
-    val_ds   = load_dataset("liamdugan/raid", "raid", split="extra")
+    print("▶ Creating validation / test splits (stratified =", bool(strat_col), ")")
+    tmp = ds.train_test_split(
+        test_size=test_fraction,
+        seed=RNG_SEED,
+        stratify_by_column=strat_col,
+    )
+    train_val, test_ds = tmp["train"], tmp["test"]
 
-    # held‑out test set
-    test_ds  = load_dataset("liamdugan/raid", "raid_test", split="test")
+    val_size = validation_fraction / (1.0 - test_fraction)
+    tmp = train_val.train_test_split(
+        test_size=val_size,
+        seed=RNG_SEED,
+        stratify_by_column=strat_col,
+    )
+    train_ds, val_ds = tmp["train"], tmp["test"]
 
+    # Drop helper column if it was added
+    if strat_col:
+        train_ds = train_ds.remove_columns(strat_col)
+        val_ds = val_ds.remove_columns(strat_col)
+        test_ds = test_ds.remove_columns(strat_col)
+    
     return DatasetDict(train=train_ds, val=val_ds, test=test_ds)
 
 

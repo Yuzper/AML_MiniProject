@@ -49,7 +49,7 @@ The preprocessing pipeline prepares the RAID dataset for training and evaluation
 
 To run the preprocessing:
 
-- Local mode: `python -m src.data_preprocessing --local --sample-size 3000`
+- Local mode: `python -m src.data_preprocessing --local --sample-size 300`
 - Production mode: `python -m src.data_preprocessing --run-name raid_full --prod`
 
 Processed datasets are saved under `data/processed/<run_name>/<split>/`.
