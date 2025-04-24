@@ -48,3 +48,4 @@ venv
 # Data folder
 data/
 outputs/
+outputs/checkpoints/distil_local/tf_model.h5
