@@ -6,13 +6,10 @@
 
 #SBATCH --cpus-per-task=8            
 #SBATCH --mem=32G                    
-#SBATCH --nodes=1
-#SBATCH --nodelist=cn[3,4,5,6,7,9,10,12,13,18,19]
-#SBATCH --gres=gpu
 
-#SBATCH --time=24:00:00              
-#SBATCH --partition=acltr                                    
-                
+#SBATCH --time=2:00:00              
+#SBATCH --partition=scavenge                                    
+                 
 #SBATCH --mail-type=END,FAIL           
 #SBATCH --mail-user=aver@itu.dk
 
@@ -26,15 +23,6 @@ eval "$(conda shell.bash hook)"
 
 # Activate your environment
 conda activate torch_1
-
-cd /home/aver/Machine_Learning/AML_MiniProject
-
-echo "Checking available GPUs:"
-nvidia-smi
-
-echo "Checking if torch can see GPU:"
-python -c 'import torch; print("CUDA available:", torch.cuda.is_available()); print("Device:", torch.cuda.get_device_name(0))'
-
 
 
 python -m src.train_torch \

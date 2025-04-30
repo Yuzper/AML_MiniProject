@@ -1,1 +1,5 @@
 Starting preprocessing...
+✅ Saved train split to data/processed/raid_full/train
+✅ Saved val split to data/processed/raid_full/val
+✅ Saved test split to data/processed/raid_full/test
+📦 All splits cached under: /home/aver/Machine_Learning/AML_MiniProject/data/processed/raid_full

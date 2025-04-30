@@ -15,8 +15,8 @@
 
 echo "Running on $(hostname):"
 module load Anaconda3
-conda create --name torch_1
-source activate torch_1
+conda create --name torch_AML
+source activate torch_AML
 conda install pytorch torchvision torchaudio pytorch-cuda=11.8 -c pytorch -c nvidia
 conda install numpy pandas scikit-learn matplotlib seaborn jupyterlab ipykernel
 pip install click datasets evaluate transformers accelerate langchain nltk tqdm tokenizers dataclasses-json orjson rouge-score loguru
