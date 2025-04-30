@@ -1,33 +1,38 @@
 #!/bin/bash
 
-#SBATCH --job-name=preprocessing-ana
+#SBATCH --job-name=preprocessing
 #SBATCH --output=ana_hpc_scripts/logs/outputs/preprocessing_%j.out   # Log file (%j = job ID)
-#SBATCH --error=ana_hpc_scripts/logs/errors/preprocessing_%j.err    # Optional: separate stderr log
-#SBATCH --gres=gpu  
-#SBATCH --cpus-per-task=8
-#SBATCH --mem-per-cpu=8G
-#SBATCH --time=0-12:00:00
-#SBATCH --partition=scavenge
-#SBATCH --mail-type=END,FAIL          
-#SBATCH --mail-user=aver@itu.dk 
+#SBATCH --error=ana_hpc_scripts/logs/errors/preprocessing_%j.err    
 
-# Activate the virtual environment
-source .venv/bin/activate
+#SBATCH --cpus-per-task=8            # Use 8 CPU cores (adjust if needed)
+#SBATCH --mem=64G                    # 32GB RAM (adjust depending on needs)
+#SBATCH --time=24:00:00              
+#SBATCH --partition=scavenge            
+                       
+#SBATCH --mail-type=END,FAIL           
+#SBATCH --mail-user=aver@itu.dk
 
-echo "Running on $(hostname):"
 
-# Set PYTHONPATH to include the repository root
-export PYTHONPATH=$(pwd)
+# Load Anaconda
+module load Anaconda3
 
-# check enviroment 
-echo "Python version: $(python --version)"
-echo "PYTHONPATH: $PYTHONPATH"
-echo "Current working directory: $(pwd)"
-echo "Current user: $(whoami)"
+# Init conda properly
+eval "$(conda shell.bash hook)"
+
+
+# Activate your environment
+conda activate torch_1
+
+# Change to your project directory if needed
+cd /home/aver/AML_MINIPROJECT
+
 
 # Run the preprocessing script
 echo "Starting preprocessing..."
-python -u -m src.data_preprocessing --run-name raid_full --prod
+python -m src.data_preprocessing \
+    --prod \
+    --tokenizer bert-base-uncased \
+    --run-name raid_full
 
 
 

@@ -1,13 +1,0 @@
-2025-04-18 11:46:58.877971: I external/local_xla/xla/tsl/cuda/cudart_stub.cc:32] Could not find cuda drivers on your machine, GPU will not be used.
-2025-04-18 11:46:58.880804: I external/local_xla/xla/tsl/cuda/cudart_stub.cc:32] Could not find cuda drivers on your machine, GPU will not be used.
-2025-04-18 11:46:58.889789: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:467] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered
-WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
-E0000 00:00:1744969618.904314 2007839 cuda_dnn.cc:8579] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered
-E0000 00:00:1744969618.908700 2007839 cuda_blas.cc:1407] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
-W0000 00:00:1744969619.050339 2007839 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.
-W0000 00:00:1744969619.050368 2007839 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.
-W0000 00:00:1744969619.050371 2007839 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.
-W0000 00:00:1744969619.050373 2007839 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.
-2025-04-18 11:46:59.053932: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
-To enable the following instructions: AVX2 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
-Generating train split: 0 examples [00:00, ? examples/s]Generating train split: 10000 examples [00:05, 1850.36 examples/s]Generating train split: 20000 examples [00:09, 2040.82 examples/s]Generating train split: 30000 examples [00:10, 3350.26 examples/s]Generating train split: 40000 examples [00:13, 3339.99 examples/s]Generating train split: 50000 examples [00:17, 2943.70 examples/s]Generating train split: 60000 examples [00:18, 4066.27 examples/s]Generating train split: 70000 examples [00:22, 3249.49 examples/s]Generating train split: 80000 examples [00:23, 4306.24 examples/s]slurmstepd: error: *** JOB 46091 ON desktop12 CANCELLED AT 2025-04-18T11:54:53 ***
