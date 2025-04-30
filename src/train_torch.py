@@ -37,6 +37,8 @@ from transformers import (
     TrainingArguments,
     EarlyStoppingCallback,
     set_seed,
+    AutoTokenizer,
+    DataCollatorWithPadding,
 )
 
 from src.model import get_model
@@ -92,6 +94,8 @@ def main(args: argparse.Namespace):
 
     # ------------------------------------------------------------------ model
     model = get_model(args.model_name)
+    tokenizer  = AutoTokenizer.from_pretrained(args.model_name)
+    collator   = DataCollatorWithPadding(tokenizer)   # dynamic batch padding
 
     # ----------------------------------------------------------------- trainer
     training_args = TrainingArguments(
@@ -100,7 +104,7 @@ def main(args: argparse.Namespace):
         per_device_train_batch_size=args.batch_size,
         per_device_eval_batch_size=args.batch_size,
         learning_rate=args.learning_rate,
-        evaluation_strategy="epoch" if val_ds is not None else "no",
+        eval_strategy="epoch" if val_ds is not None else "no",
         save_strategy="epoch" if val_ds is not None else "no",
         load_best_model_at_end=val_ds is not None,
         metric_for_best_model="accuracy",
@@ -119,6 +123,7 @@ def main(args: argparse.Namespace):
         args=training_args,
         train_dataset=train_ds,
         eval_dataset=val_ds,
+        data_collator=collator,
         compute_metrics=compute_metrics,
         callbacks=callbacks,
     )

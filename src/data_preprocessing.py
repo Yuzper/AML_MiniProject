@@ -8,7 +8,7 @@ Exports Hugging Face **arrow** datasets ready for PyTorch/🤗 Trainer.
 Example (local debug run):
     python -m src.data_preprocessing \
         --local \
-        --sample-size 3_000 \
+        --sample-size 100 \
         --tokenizer distilbert-base-uncased \
         --run-name raid_local
 
