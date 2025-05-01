@@ -21,7 +21,7 @@ eval "$(conda shell.bash hook)"
 
 
 # Activate your environment
-conda activate torch_1
+conda activate torch_AML
 
 # Change to your project directory if needed
 cd /home/aver/AML_MINIPROJECT
