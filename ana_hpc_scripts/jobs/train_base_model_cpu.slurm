@@ -22,7 +22,7 @@ eval "$(conda shell.bash hook)"
 
 
 # Activate your environment
-conda activate torch_1
+conda activate torch_AML
 
 
 python -m src.train_torch \

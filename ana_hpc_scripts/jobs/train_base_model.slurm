@@ -11,8 +11,8 @@
 #SBATCH --gres=gpu
 
 #SBATCH --time=24:00:00              
-#SBATCH --partition=acltr                                    
-                
+#SBATCH --partition=acltr            # Because your project might use GPU          
+                       
 #SBATCH --mail-type=END,FAIL           
 #SBATCH --mail-user=aver@itu.dk
 
@@ -25,7 +25,7 @@ eval "$(conda shell.bash hook)"
 
 
 # Activate your environment
-conda activate torch_1
+conda activate torch_AML
 
 cd /home/aver/Machine_Learning/AML_MiniProject
 
