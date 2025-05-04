@@ -1,8 +1,8 @@
 #!/bin/bash
 
-#SBATCH --job-name=train_base_mode-ana
-#SBATCH --output=ana_hpc_scripts/logs/outputs/train_base_model_%j.out   # Log file (%j = job ID)
-#SBATCH --error=ana_hpc_scripts/logs/errors/train_base_mode_%j.err    # Optional: separate stderr log
+#SBATCH --job-name=train_roberta
+#SBATCH --output=ana_hpc_scripts/logs/outputs/train_roberta%j.out   # Log file (%j = job ID)
+#SBATCH --error=ana_hpc_scripts/logs/errors/train_roberta%j.err    # Optional: separate stderr log
 
 #SBATCH --cpus-per-task=8            
 #SBATCH --mem=32G                    
@@ -27,8 +27,9 @@ conda activate torch_AML
 
 python -m src.train_torch \
        --dataset-root data/processed/raid_full \
-       --model-name bert-base-uncased \
+       --model-name roberta-base \
        --epochs 5 \
        --batch-size 8 \
        --learning-rate 2e-5 \
-       --run-name bert_full
+       --run-name roberta-base
+       

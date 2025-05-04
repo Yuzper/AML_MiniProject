@@ -1,4 +1,5 @@
 #!/bin/bash
+#!/bin/bash
 
 #SBATCH --job-name=train_base_mode-ana
 #SBATCH --output=ana_hpc_scripts/logs/outputs/train_base_model_%j.out   # Log file (%j = job ID)
