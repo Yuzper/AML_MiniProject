@@ -4,3 +4,6 @@ Starting job inside Singularity container
 4.44.0
 Loading checkpoint from outputs/checkpoints/roberta_full/checkpoint-74718
 Evaluating val (74,718 rows)
+Evaluating test (74,718 rows)
+Metrics written to outputs/metrics/bert_full_eval_metrics.json
+Job completed
