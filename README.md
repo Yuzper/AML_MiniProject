@@ -11,6 +11,17 @@ Provide informal documentation in this README or directly in a Jupyter notebook 
 - **Key experiments & results**: present and explain results, e.g., in simple accuracy tables, error graphs, or visualizations of representations and/or edge cases – keep it crisp.
 - **Discussion**: summarize the most important results and lessons learned (what is good, what can be improved).
 
+### Central Problem, Domain, Data Characteristics (AI Generated - gotta modify)
+The central problem addressed in this project is detecting AI-generated text using the RAID dataset. The RAID dataset is a benchmark dataset designed for anti-AI-text detection, containing examples of both human-written and machine-generated text. The dataset is split into training, validation, and test sets, and includes text samples with binary labels (`human` or `machine`). The preprocessing pipeline combines relevant fields (e.g., `title` and `generation`) into a unified `text` column for consistency across splits. The dataset supports both local debugging with small samples and full-scale production runs.
+
+### Central Method: Chosen Architecture and Training Mechanisms (AI Generated - gotta modify)
+The project uses BERT-based architectures (`bert-base-uncased` and `distilbert-base-uncased`) for sequence classification. These models are fine-tuned on the RAID dataset using the Hugging Face Transformers library. The training pipeline includes:
+- Tokenization with the specified tokenizer (e.g., `bert-base-uncased`).
+- Binary label encoding (`human` → 0, `machine` → 1).
+- Training with PyTorch and the Hugging Face `Trainer` API, which supports features like early stopping and checkpointing.
+
+The choice of BERT-based models is motivated by their strong performance on text classification tasks. DistilBERT is used for faster experimentation due to its reduced size, while BERT is used for full-scale production runs to achieve higher accuracy. The training script ensures reproducibility by setting random seeds and saving the best model checkpoint for evaluation.
+
 ---
 
 ## TO RUN THE PROJECT
