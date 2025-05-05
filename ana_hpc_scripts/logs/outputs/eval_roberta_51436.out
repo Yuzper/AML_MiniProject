@@ -1,0 +1,6 @@
+Checking Python version in container:
+Python 3.10.12
+Starting job inside Singularity container
+4.44.0
+Loading checkpoint from outputs/checkpoints/roberta_full/checkpoint-74718
+Evaluating val (74,718 rows)
