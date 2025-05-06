@@ -37,7 +37,9 @@ Both RoBERTa and bert_full achieved high accuracies on our test set, being 97.14
 
 
 ### Discussion
-Our bert model made 304 mispredictions with 6 of them being false negatives. Meaning that it more often than not overpredicted AI text. Depending on the domain this could be a good trade-off and the current model currently minimizes the amount of AI generated text that can get through it's detection, at the cost of more manual review of tagged content.
+Our bert model made 304 mispredictions with 6 of them being false negatives. Meaning that it more often than not overpredicted AI text. Depending on the domain this could be a good trade-off and the current model currently minimizes the amount of AI generated text that can get through it's detection, at the cost of more manual review of tagged content. 
+
+While this experiment worked well as a proof of concept, broadening the scope of the task and moving on-to the other domains present should allow for more interesting analysis of the AI generated text detection, since the approach clearly has no problem with the Reddit subset of the data.
 
 
 ---
