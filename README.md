@@ -33,7 +33,7 @@ The training script ensures reproducibility with random seeds sat and saving the
 
 
 ### Key Experiments & Results
-Both RoBERTa and bert_full achieved high accuracies on our test set, being 97.14% and 99.59% respectfully. RoBERTa was trained for an epoch less and therefore could possibly achieve an accuracy more on par with the BERT model however due to time limitations and compute resource constrain this is left as further work.  
+Both RoBERTa and bert_full achieved high accuracies on our test set, being 97.14% and 99.59% respectfully. RoBERTa was trained for an epoch less and therefore could possibly achieve an accuracy more on par with the BERT model, however due to time limitations and compute resource constrain this is left as further work.  
 
 
 ### Discussion
