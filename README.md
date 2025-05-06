@@ -26,7 +26,7 @@ The training pipeline includes:
 - Binary label encoding (`human` → 0, `machine` → 1).
 - Training with PyTorch and the Hugging Face `Trainer` API, which supports features like early stopping and checkpointing.
 
-DistilBERT is used for low resource local experimentation due to its lighter computational load and faster training times.
+DistilBERT is used for local experimentation due to its lighter computational load and faster training times.
 BERT is used as baseline for full-scale training on the HPC cluster. The choice of BERT models is motivated by their strong performance on various text classification tasks.
 Additionally, RoBERTa is introduced to explore the benefits of its optimized pre-training and larger training corpus. RoBERTa has demonstrated superior generalization in many NLP benchmarks, making it a promising candidate for better detection task.
 
@@ -43,10 +43,12 @@ Both RoBERTa and bert_full achieved high accuracies on our test set, being 97.14
 
 ### BERT training Graph:
 ![BERT_training](/Plots/BERT_training.png)
+
 We see a nice reduction of the loss during training paired with an seemingly immidiate max training accuracy, this could support our expectation that the task is too simple for the models architecture.
 
 ### RoBERTa training Graph:
 ![RoBERTa_training](/Plots/RoBERTa_training.png)
+
 On the RoBERTa training we see a highly fluctuating loss graph, which could be a symptom of too low batch size or learning rate. We did reduce the batch size compared to base BERT, which was done due to different available training GPU's.
 
 ### Discussion
