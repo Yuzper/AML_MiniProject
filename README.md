@@ -128,7 +128,7 @@ To evaluate the model:
 python -m src.evaluate \
     --dataset-root data/processed/raid_full \
     --run-name bert_full \
-    --split test \
+    --split val \
     --batch-size 8 \
     --save-preds
 ```
