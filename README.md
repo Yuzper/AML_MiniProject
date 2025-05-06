@@ -1,26 +1,49 @@
 # Project Documentation
 
-## Submission
-Submit via link to your github.itu.dk repo (provide access to stehe, chur, and star) or Colab notebook.
+## Team Members
+Ivan Petrov, Jesper Terkildsen and Ana Vera Vázquez
 
-## Documentation
-Provide informal documentation in this README or directly in a Jupyter notebook to document/describe:
-- **Names of all involved team members**
-- **Central problem, domain, data characteristics**
-- **Central method**: chosen architecture and training mechanisms, with a brief justification if non-standard
-- **Key experiments & results**: present and explain results, e.g., in simple accuracy tables, error graphs, or visualizations of representations and/or edge cases – keep it crisp.
-- **Discussion**: summarize the most important results and lessons learned (what is good, what can be improved).
+### Central Problem, Domain, Data Characteristics
+Problem at hand: Detecting AI generated text to distinguish human-written and machine-generated content.
 
-### Central Problem, Domain, Data Characteristics (AI Generated - gotta modify)
-The central problem addressed in this project is detecting AI-generated text using the RAID dataset. The RAID dataset is a benchmark dataset designed for anti-AI-text detection, containing examples of both human-written and machine-generated text. The dataset is split into training, validation, and test sets, and includes text samples with binary labels (`human` or `machine`). The preprocessing pipeline combines relevant fields (e.g., `title` and `generation`) into a unified `text` column for consistency across splits. The dataset supports both local debugging with small samples and full-scale production runs.
+Domain: NLP/Text classification, specifically AI generated text detection.
 
-### Central Method: Chosen Architecture and Training Mechanisms (AI Generated - gotta modify)
-The project uses BERT-based architectures (`bert-base-uncased` and `distilbert-base-uncased`) for sequence classification. These models are fine-tuned on the RAID dataset using the Hugging Face Transformers library. The training pipeline includes:
+Data: RAID (Robust AI Detection) dataset, containing binary-labeled text samples:
+ - Class 0: Human-written text
+ - Class 1: AI-generated text
+
+The full dataset contains 6 million text samples combined from both human written and AI generated content, spanning 8 different domains such as, abstracts, books, Reddit posts and recipes. The data contains additional meta data for the AI generated samples about the underliying model (varies GPT models, Llama etc), decoding strategies (Greedy, Random, Greedy w/ Rep Penalty, and Sampling w/ Rep Penalty) and adversarial attacks used to modify text to decieve the detectors.
+For our purposes we choose to narrow down the scope to only the Reddit posts domain, so classifying if a Reddit post is AI or human written.
+After pre-processing the data is structured into training, validation, and test splits, with combined fields (e.g., title, generation) into unified text samples. The dataset enables both rapid debugging (small subsets) and larger-scale experimentation for the cluster.
+
+![alt text](https://github.com/Yuzper/AML_MiniProject/tree/main/readme_helper/RAID_data_distribution.PNG "RAID_data_distribution.PNG")
+
+### Central Method: Chosen Architecture and Training Mechanisms
+The project uses BERT-based architectures (`distilbert-base-uncased` for local, `bert-base-uncased` and `RoBERTa-base-uncased` in cluster training) for sequence classification. These models are fine-tuned on the previous mentioned RAID dataset using the Hugging Face Transformers library.
+
+The training pipeline includes:
 - Tokenization with the specified tokenizer (e.g., `bert-base-uncased`).
 - Binary label encoding (`human` → 0, `machine` → 1).
 - Training with PyTorch and the Hugging Face `Trainer` API, which supports features like early stopping and checkpointing.
 
-The choice of BERT-based models is motivated by their strong performance on text classification tasks. DistilBERT is used for faster experimentation due to its reduced size, while BERT is used for full-scale production runs to achieve higher accuracy. The training script ensures reproducibility by setting random seeds and saving the best model checkpoint for evaluation.
+DistilBERT is used for low resource local experimentation due to its lighter computational load and faster training times.
+BERT is used as baseline for full-scale training on the HPC cluster. The choice of BERT models is motivated by their strong performance on various text classification tasks.
+Additionally, RoBERTa is introduced to explore the benefits of its optimized pre-training and larger training corpus. RoBERTa has demonstrated superior generalization in many NLP benchmarks, making it a promising candidate for better detection task.
+
+The training script ensures reproducibility with random seeds sat and saving the best model checkpoint for later evaluation. In addition the `RoBERTa` model is introduced with the hope of utilizing its larger corpus and training data to the task.
+
+
+### Key Experiments & Results
+Both RoBERTa and bert_full achieved high accuracies on our test set, being 97.14% and 99.59% respectfully. RoBERTa was trained for an epoch less and therefore could possibly achieve an accuracy more on par with the BERT model, however due to time limitations and compute resource constrain this is left as further work.
+
+
+### Discussion
+Our BERT model made 304 mispredictions with 6 of them being false negatives. Meaning that it more often than not overpredicted AI text. Depending on the domain this could be a good trade-off and the current model currently minimizes the amount of AI generated text that can get through it's detection, at the cost of more manual review of tagged content.
+
+While this experiment worked well as a proof of concept, broadening the scope of the task and moving on to the other domains present should allow for more interesting analysis of the AI generated text detection, since the approach clearly has no problem with the Reddit subset of the data.
+
+Another explaination is the base BERT model could already do the task with high accuracy with no fine-tuning needed. This could have been looked into by rerunning fine-tuning using increasingly larger subset procentages of the dataset to determine how much the fine-tuning actually contributed to the models performances, if any.
+
 
 ---
 
@@ -110,7 +133,7 @@ To evaluate the model:
 python -m src.evaluate \
     --dataset-root data/processed/raid_full \
     --run-name bert_full \
-    --split test \
+    --split val \
     --batch-size 8 \
     --save-preds
 ```

@@ -118,21 +118,25 @@ def evaluate_split(split_name: str, ds, trainer: Trainer, run_name: str, save_pr
         out_dir = Path("outputs/predictions")
         out_dir.mkdir(parents=True, exist_ok=True)
         csv_path = out_dir / f"{run_name}_{split_name}_predictions.csv"
-        with csv_path.open("w", newline="", encoding="utf-8") as f:
+        with csv_path.open("w+", newline="", encoding="utf-8") as f:
             writer = csv.writer(f)
             header = ["index", "prediction"]
             if labels is not None:
                 header.append("label")
+            if 'id' in ds.column_names:
+                header.append("id")
             if "text" in ds.column_names:
                 header.append("text")
             writer.writerow(header)
-            for idx, p in enumerate(preds):
-                row = [idx, int(p)]
-                if labels is not None:
-                    row.append(int(labels[idx]))
-                if "text" in ds.column_names:
-                    row.append(ds["text"][idx].replace("\n", " ").strip())
-                writer.writerow(row)
+            if labels is not None:
+                for idx, p in enumerate(preds):
+                    row = [idx, int(p)]
+                    if labels is not None and int(labels[idx])!=p:
+                        row.append(int(labels[idx]))
+                        row.append(ds["id"][idx])
+                        if "text" in ds.column_names:
+                            row.append(ds["text"][idx].replace("\n", " ").strip())
+                        writer.writerow(row)
         print("Predictions saved to", csv_path)
 
     return metrics
