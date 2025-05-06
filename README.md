@@ -33,7 +33,7 @@ The training script ensures reproducibility with random seeds sat and saving the
 
 
 ### Key Experiments & Results
-
+Both RoBERTa and bert_full achieved an high accuracies on our test set, being 97.14% and 99.59%. 
 
 
 ### Discussion
