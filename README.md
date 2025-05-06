@@ -16,7 +16,7 @@ The full dataset contains 6 million text samples combined from both human writte
 For our purposes we choose to narrow down the scope to only the Reddit posts domain, so classifying if a Reddit post is AI or human written.
 After pre-processing the data is structured into training, validation, and test splits, with combined fields (e.g., title, generation) into unified text samples. The dataset enables both rapid debugging (small subsets) and larger-scale experimentation for the cluster.
 
-![alt text](https://github.com/Yuzper/AML_MiniProject/tree/main/readme_helper/RAID_data_distribution.PNG "RAID_data_distribution.PNG")
+![RAID_Data](/readme_helper/RAID_data_distribution.PNG)
 
 ### Central Method: Chosen Architecture and Training Mechanisms
 The project uses BERT-based architectures (`distilbert-base-uncased` for local, `bert-base-uncased` and `RoBERTa-base-uncased` in cluster training) for sequence classification. These models are fine-tuned on the previous mentioned RAID dataset using the Hugging Face Transformers library.
@@ -35,7 +35,19 @@ The training script ensures reproducibility with random seeds sat and saving the
 
 ### Key Experiments & Results
 Both RoBERTa and bert_full achieved high accuracies on our test set, being 97.14% and 99.59% respectfully. RoBERTa was trained for an epoch less and therefore could possibly achieve an accuracy more on par with the BERT model, however due to time limitations and compute resource constrain this is left as further work.
+| Model Type | Accuracy % | Epoch      |
+|------------|------------|------------|
+| base BERT  | 99.59%     | 4          |
+| RoBERTa    | 97.14%     | 3          |
 
+
+### BERT training Graph:
+![BERT_training](/Plots/BERT_training.png)
+We see a nice reduction of the loss during training paired with an seemingly immidiate max training accuracy, this could support our expectation that the task is too simple for the models architecture.
+
+### RoBERTa training Graph:
+![RoBERTa_training](/Plots/RoBERTa_training.png)
+On the RoBERTa training we see a highly fluctuating loss graph, which could be a symptom of too low batch size or learning rate. We did reduce the batch size compared to base BERT, which was done due to different available training GPU's.
 
 ### Discussion
 Our BERT model made 304 mispredictions with 6 of them being false negatives. Meaning that it more often than not overpredicted AI text. Depending on the domain this could be a good trade-off and the current model currently minimizes the amount of AI generated text that can get through it's detection, at the cost of more manual review of tagged content.
