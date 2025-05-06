@@ -1,7 +1,7 @@
 # Project Documentation
 
 ## Team Members
-Ivan Petrov, Jesper Terkildsen and Ana Ana Vera Vázquez
+Ivan Petrov, Jesper Terkildsen and Ana Vera Vázquez
 
 ### Central Problem, Domain, Data Characteristics
 Problem at hand: Detecting AI generated text to distinguish human-written and machine-generated content.
