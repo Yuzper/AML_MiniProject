@@ -13,6 +13,7 @@ Data: RAID (Robust AI Detection) dataset, containing binary-labeled text samples
  - Class 1: AI-generated text
 
 The full dataset contains 6 million text samples combined from both human written and AI generated content, spanning 8 different domains such as, abstracts, books, Reddit posts and recipes. The data contains additional meta data for the AI generated samples about the underliying model (varies GPT models, Llama etc), decoding strategies (Greedy, Random, Greedy w/ Rep Penalty, and Sampling w/ Rep Penalty) and adversarial attacks used to modify text to decieve the detectors.
+For our purposes we choose to narrow down the scope to only the Reddit posts domain, so classifying if a Reddit post is AI or human written.
 After pre-processing the data is structured into training, validation, and test splits, with combined fields (e.g., title, generation) into unified text samples. The dataset enables both rapid debugging (small subsets) and larger-scale experimentation for the cluster.
 
 ![alt text](https://github.com/Yuzper/AML_MiniProject/tree/main/readme_helper/RAID_data_distribution.PNG "RAID_data_distribution.PNG")
@@ -33,13 +34,15 @@ The training script ensures reproducibility with random seeds sat and saving the
 
 
 ### Key Experiments & Results
-Both RoBERTa and bert_full achieved high accuracies on our test set, being 97.14% and 99.59% respectfully. RoBERTa was trained for an epoch less and therefore could possibly achieve an accuracy more on par with the BERT model, however due to time limitations and compute resource constrain this is left as further work.  
+Both RoBERTa and bert_full achieved high accuracies on our test set, being 97.14% and 99.59% respectfully. RoBERTa was trained for an epoch less and therefore could possibly achieve an accuracy more on par with the BERT model, however due to time limitations and compute resource constrain this is left as further work.
 
 
 ### Discussion
-Our bert model made 304 mispredictions with 6 of them being false negatives. Meaning that it more often than not overpredicted AI text. Depending on the domain this could be a good trade-off and the current model currently minimizes the amount of AI generated text that can get through it's detection, at the cost of more manual review of tagged content. 
+Our BERT model made 304 mispredictions with 6 of them being false negatives. Meaning that it more often than not overpredicted AI text. Depending on the domain this could be a good trade-off and the current model currently minimizes the amount of AI generated text that can get through it's detection, at the cost of more manual review of tagged content.
 
-While this experiment worked well as a proof of concept, broadening the scope of the task and moving on-to the other domains present should allow for more interesting analysis of the AI generated text detection, since the approach clearly has no problem with the Reddit subset of the data.
+While this experiment worked well as a proof of concept, broadening the scope of the task and moving on to the other domains present should allow for more interesting analysis of the AI generated text detection, since the approach clearly has no problem with the Reddit subset of the data.
+
+Another explaination is the base BERT model could already do the task with high accuracy with no fine-tuning needed. This could have been looked into by rerunning fine-tuning using increasingly larger subset procentages of the dataset to determine how much the fine-tuning actually contributed to the models performances, if any.
 
 
 ---
